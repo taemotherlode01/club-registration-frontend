@@ -1,0 +1,4 @@
+.table-responsive table td,
+.table-responsive table th {
+  font-size: 0.7rem; /* ปรับขนาดตัวอักษรตามที่ต้องการ */
+}

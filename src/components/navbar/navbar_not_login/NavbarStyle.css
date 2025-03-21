@@ -1,0 +1,28 @@
+*{
+  margin: 0px;
+  padding: 0px;
+}
+#basic-nav-dropdown{
+    color: white;
+}
+#link-nav{
+    color: white;
+}
+#link-nav:hover{
+    color: #ff9800;
+    border-bottom: #ff9800;
+}
+.custom-toggler .navbar-toggler-icon {
+    color: white; /* เปลี่ยนสี toggle hamburger เป็นสีขาว */
+  }
+  /* NavbarStyle.css */
+
+.navbar-nav .nav-link,
+.navbar-nav .nav-item .nav-link{
+  color: #fff; 
+}
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-item .nav-link:hover {
+  color: #FFD700; /* เปลี่ยนสีเมื่อโฮเวอร์ */
+}
+

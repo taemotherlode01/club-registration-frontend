@@ -1,0 +1,18 @@
+.container-card-management{
+    display: flex;
+    flex-wrap: wrap;
+    padding: 20px;
+    align-items: center;
+    justify-content: center;
+}
+.card-link {
+    background-color: #f0f0f0; /* เปลี่ยนสีพื้นหลังตามที่คุณต้องการ */
+    padding: 5px 10px; /* ปรับขนาด padding ตามที่ต้องการ */
+    border-radius: 5px; /* ปรับขนาดขอบโค้งตามที่ต้องการ */
+    color: #333; /* เปลี่ยนสีตัวอักษรตามที่ต้องการ */
+    text-decoration: none; /* ลบเส้นใต้ข้อความลิงก์ */
+  }
+  
+  .card-link:hover {
+    background-color: #e0e0e0; /* เปลี่ยนสีพื้นหลังเมื่อเม้าส์ไปชี้ */
+  }

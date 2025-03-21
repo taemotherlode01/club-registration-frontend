@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@100..900&display=swap');
+
+@media print {
+    .delete-column {
+      display: none !important;
+    }
+    .container-print{
+      padding: 20px;
+    }
+    .club-name{
+      text-align: center;
+      font-weight: bold;
+    }
+
+  }
+  .table-container {
+    max-height: 500px; /* ปรับความสูงตามที่ต้องการ */
+    overflow: auto;
+  }  
+
+.table-st{
+  font-size: 10px;
+}
