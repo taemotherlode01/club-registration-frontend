@@ -16,7 +16,7 @@ function AllTeachers() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [file, setFile] = useState(null);
-  const [isUploadDisabled, setIsUploadDisabled] = useState(true); // เพิ่ม state เพื่อควบคุมปุ่ม Upload
+  const [isUploadDisabled, setIsUploadDisabled] = useState(true);
   const [uploadStatus, setUploadStatus] = useState('');
   const [selectAll, setSelectAll] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
@@ -40,54 +40,23 @@ function AllTeachers() {
 
   const handleDownloadTemplate = () => {
     const wb = XLSX.utils.book_new();
-    
-    // สร้างข้อมูลสำหรับเทมเพลตครู
     const templateData = [
-        { 
-            "อีเมล": "", 
-            "รหัสผ่าน": "", 
-            "เบอร์โทร": "", 
-            "ชื่อ": "", 
-            "นามสกุล": "", 
-            "รหัสบทบาท": 0,
-        }
+      { 
+        "อีเมล": "", 
+        "รหัสผ่าน": "", 
+        "เบอร์โทร": "", 
+        "ชื่อ": "", 
+        "นามสกุล": "", 
+        "รหัสบทบาท": 0,
+      }
     ];
-
-    // สร้าง worksheet จากข้อมูล
     const ws = XLSX.utils.json_to_sheet(templateData);
-
-    // ปรับความกว้างของคอลัมน์
     ws['!cols'] = [
-        { wch: 25 }, // อีเมล
-        { wch: 15 }, // รหัสผ่าน
-        { wch: 15 }, // เบอร์โทร
-        { wch: 15 }, // ชื่อ
-        { wch: 20 }, // นามสกุล
-        { wch: 10 }, // รหัสบทบาท
+      { wch: 25 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 20 }, { wch: 10 },
     ];
-
-    // กำหนดสไตล์ให้กับ header
-    const range = XLSX.utils.decode_range(ws['!ref']);
-    for (let C = range.s.c; C <= range.e.c; ++C) {
-        const cell_address = { c: C, r: 0 }; // Header row
-        const cell_ref = XLSX.utils.encode_cell(cell_address);
-        
-        if (ws[cell_ref]) {
-            ws[cell_ref].s = {
-                font: { bold: true, color: { rgb: "FFFFFF" } }, // ตัวหนา สีขาว
-                fill: { fgColor: { rgb: "4F81BD" } }, // พื้นหลังสีฟ้า
-                alignment: { horizontal: "center", vertical: "center" },
-            };
-        }
-    }
-
-    // เพิ่ม worksheet ลงใน workbook
     XLSX.utils.book_append_sheet(wb, ws, "Teacher Template");
-
-    // บันทึกและดาวน์โหลดไฟล์
     XLSX.writeFile(wb, "teacher_template.xlsx");
-};
-
+  };
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
@@ -108,30 +77,27 @@ function AllTeachers() {
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
     setFile(selectedFile);
-    setIsUploadDisabled(!selectedFile); // Disable ปุ่มถ้าไม่มีการเลือกไฟล์, Enable ถ้ามีไฟล์
+    setIsUploadDisabled(!selectedFile);
   };
 
   const handleUpload = async () => {
     try {
       const formData = new FormData();
       formData.append("file", file);
-  
       await axios.post("https://club-registration-backend-production.up.railway.app/add_teachers_excel", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
-  
       Swal.fire({
         icon: 'success',
         title: 'อัปโหลดสำเร็จ!',
         text: 'ไฟล์ถูกอัปโหลดเรียบร้อยแล้ว',
         confirmButtonText: 'ตกลง'
       });
-  
       fetchData();
-      setFile(null); // รีเซ็ตไฟล์หลังอัปโหลดสำเร็จ
-      setIsUploadDisabled(true); // Disable ปุ่มหลังอัปโหลดสำเร็จ
+      setFile(null);
+      setIsUploadDisabled(true);
     } catch (error) {
       console.error("Error uploading file:", error);
       Swal.fire({
@@ -285,6 +251,59 @@ function AllTeachers() {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+  const Pagination = ({ itemsPerPage, totalItems, paginate, currentPage }) => {
+    const pageNumbers = [];
+    for (let i = 1; i <= Math.ceil(totalItems / itemsPerPage); i++) {
+      pageNumbers.push(i);
+    }
+
+    const maxPagesToShow = 5;
+    let startPage, endPage;
+
+    if (pageNumbers.length <= maxPagesToShow) {
+      startPage = 1;
+      endPage = pageNumbers.length;
+    } else {
+      const maxPagesBeforeCurrentPage = Math.floor(maxPagesToShow / 2);
+      const maxPagesAfterCurrentPage = Math.ceil(maxPagesToShow / 2) - 1;
+
+      if (currentPage <= maxPagesBeforeCurrentPage) {
+        startPage = 1;
+        endPage = maxPagesToShow;
+      } else if (currentPage + maxPagesAfterCurrentPage >= pageNumbers.length) {
+        startPage = pageNumbers.length - maxPagesToShow + 1;
+        endPage = pageNumbers.length;
+      } else {
+        startPage = currentPage - maxPagesBeforeCurrentPage;
+        endPage = currentPage + maxPagesAfterCurrentPage;
+      }
+    }
+
+    return (
+      <nav>
+        <ul className="pagination">
+          <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+            <button onClick={() => paginate(currentPage - 1)} className="page-link">
+              ก่อนหน้า
+            </button>
+          </li>
+          {pageNumbers.slice(startPage - 1, endPage).map((number) => (
+            <li key={number} className={`page-item ${currentPage === number ? 'active' : ''}`}>
+              <button onClick={() => paginate(number)} className="page-link">
+                {number}
+              </button>
+            </li>
+          ))}
+          <li className={`page-item ${currentPage === pageNumbers.length ? 'disabled' : ''}`}>
+            <button onClick={() => paginate(currentPage + 1)} className="page-link">
+              ถัดไป
+            </button>
+          </li>
+        </ul>
+      </nav>
+    );
+  };
+
   return (
     <div className="container">
       <div className='d-flex flex-row bd-highlight mb-3'>
@@ -302,13 +321,11 @@ function AllTeachers() {
         <div className="p-2 bd-highlight">
           <button onClick={handleUpload} className='btn btn-primary' disabled={isUploadDisabled}>Upload</button>
         </div>
-
         <div className="p-2 bd-highlight">
           <button onClick={handleDownloadTemplate} className='btn btn-secondary'>
             ดาวน์โหลดเทมเพลต
           </button>
         </div>
-
       </div>
       <div className="row mb-3">
         <div className="col">
@@ -376,15 +393,12 @@ function AllTeachers() {
           </tbody>
         </table>
       </div>
-      <ul className="pagination">
-        {[...Array(Math.ceil(filteredTeachers.length / itemsPerPage)).keys()].map((number) => (
-          <li key={number + 1} className="page-item">
-            <button onClick={() => paginate(number + 1)} className="page-link">
-              {number + 1}
-            </button>
-          </li>
-        ))}
-      </ul>
+      <Pagination
+        itemsPerPage={itemsPerPage}
+        totalItems={filteredTeachers.length}
+        paginate={paginate}
+        currentPage={currentPage}
+      />
 
       {/* Modal สำหรับเพิ่มครู */}
       <Modal show={showAddTeacher} onHide={handleCloseAddTeacher}>
