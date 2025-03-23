@@ -18,7 +18,7 @@ export default function NavbarComponent() {
   return (
     <Navbar expand="lg" style={navbarStyle} className="justify-content-between">
       <Container>
-        <Navbar.Brand href="/" style={linkStyle}>โรงเรียนของเทพวิทยา</Navbar.Brand>
+        <Navbar.Brand href="/" style={linkStyle}>โรงเรียนสยามปรีชากร</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto">  

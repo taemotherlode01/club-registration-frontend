@@ -64,7 +64,7 @@ export default function NavbarStudentLogin() {
     <Navbar expand="lg" style={navbarStyle} className="justify-content-between">
       <Container>
      
-        <Navbar.Brand href="/student-page" style={linkStyle}>โรงเรียนของเทพวิทยา</Navbar.Brand>              
+        <Navbar.Brand href="/student-page" style={linkStyle}>โรงเรียนสยามปรีชากร</Navbar.Brand>              
         
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">

@@ -63,10 +63,10 @@ export default function NavbarTeacherLogin() {
     <Navbar expand="lg" style={navbarStyle} className="justify-content-between">
       <Container>
       {role === 'ADMIN' && (
-        <Navbar.Brand href="/admin-dashboard" style={linkStyle}>โรงเรียนของเทพวิทยา</Navbar.Brand>              
+        <Navbar.Brand href="/admin-dashboard" style={linkStyle}>โรงเรียนสยามปรีชากร</Navbar.Brand>              
         )}
         {role === 'TEACHER' && (
-        <Navbar.Brand href="/teacher-dashboard" style={linkStyle}>โรงเรียนของเทพวิทยา</Navbar.Brand>              
+        <Navbar.Brand href="/teacher-dashboard" style={linkStyle}>โรงเรียนสยามปรีชากร</Navbar.Brand>              
         )}
         
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
