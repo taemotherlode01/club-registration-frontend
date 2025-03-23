@@ -118,6 +118,59 @@ export default function HomePage() {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+  const Pagination = ({ itemsPerPage, totalItems, paginate, currentPage }) => {
+    const pageNumbers = [];
+    for (let i = 1; i <= Math.ceil(totalItems / itemsPerPage); i++) {
+      pageNumbers.push(i);
+    }
+
+    const maxPagesToShow = 5;
+    let startPage, endPage;
+
+    if (pageNumbers.length <= maxPagesToShow) {
+      startPage = 1;
+      endPage = pageNumbers.length;
+    } else {
+      const maxPagesBeforeCurrentPage = Math.floor(maxPagesToShow / 2);
+      const maxPagesAfterCurrentPage = Math.ceil(maxPagesToShow / 2) - 1;
+
+      if (currentPage <= maxPagesBeforeCurrentPage) {
+        startPage = 1;
+        endPage = maxPagesToShow;
+      } else if (currentPage + maxPagesAfterCurrentPage >= pageNumbers.length) {
+        startPage = pageNumbers.length - maxPagesToShow + 1;
+        endPage = pageNumbers.length;
+      } else {
+        startPage = currentPage - maxPagesBeforeCurrentPage;
+        endPage = currentPage + maxPagesAfterCurrentPage;
+      }
+    }
+
+    return (
+      <nav>
+        <ul className="pagination">
+          <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+            <button onClick={() => paginate(currentPage - 1)} className="page-link">
+              ก่อนหน้า
+            </button>
+          </li>
+          {pageNumbers.slice(startPage - 1, endPage).map((number) => (
+            <li key={number} className={`page-item ${currentPage === number ? 'active' : ''}`}>
+              <button onClick={() => paginate(number)} className="page-link">
+                {number}
+              </button>
+            </li>
+          ))}
+          <li className={`page-item ${currentPage === pageNumbers.length ? 'disabled' : ''}`}>
+            <button onClick={() => paginate(currentPage + 1)} className="page-link">
+              ถัดไป
+            </button>
+          </li>
+        </ul>
+      </nav>
+    );
+  };
+
   return (
     <div className="page-wrapper">
       <Navbar />
@@ -203,15 +256,12 @@ export default function HomePage() {
             </tbody>
           </Table>
         </div>
-        <ul className="pagination">
-          {[...Array(Math.ceil(filteredClubs.length / itemsPerPage)).keys()].map((number) => (
-            <li key={number + 1} className="page-item">
-              <button onClick={() => paginate(number + 1)} className="page-link">
-                {number + 1}
-              </button>
-            </li>
-          ))}
-        </ul>
+        <Pagination
+          itemsPerPage={itemsPerPage}
+          totalItems={filteredClubs.length}
+          paginate={paginate}
+          currentPage={currentPage}
+        />
       </div>
       <Footer />
     </div>
