@@ -12,11 +12,11 @@ import * as XLSX from 'xlsx';
 function AllStudents() {
   const [students, setStudents] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [confirmedSearchTerm, setConfirmedSearchTerm] = useState(''); // ใช้สำหรับชื่อ
+  const [confirmedSearchTerm, setConfirmedSearchTerm] = useState('');
   const [studentIdSearchTerm, setStudentIdSearchTerm] = useState('');
-  const [confirmedStudentIdSearchTerm, setConfirmedStudentIdSearchTerm] = useState(''); // ใช้สำหรับรหัสนักเรียน
+  const [confirmedStudentIdSearchTerm, setConfirmedStudentIdSearchTerm] = useState('');
   const [cardCodeSearchTerm, setCardCodeSearchTerm] = useState('');
-  const [confirmedCardCodeSearchTerm, setConfirmedCardCodeSearchTerm] = useState(''); // ใช้สำหรับเลขประจำตัวประชาชน
+  const [confirmedCardCodeSearchTerm, setConfirmedCardCodeSearchTerm] = useState('');
   const [selectedClassName, setSelectedClassName] = useState('');
   const [selectedRoomName, setSelectedRoomName] = useState('');
   const [isRoomNameDisabled, setIsRoomNameDisabled] = useState(true);
@@ -24,7 +24,6 @@ function AllStudents() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [roomNames, setRoomNames] = useState([]);
   const [sortBy, setSortBy] = useState('');
-  
   const [file, setFile] = useState(null);
   const [isUploadDisabled, setIsUploadDisabled] = useState(true);
   const [uploadStatus, setUploadStatus] = useState('');
@@ -45,15 +44,12 @@ function AllStudents() {
       setConfirmedSearchTerm(searchTerm);
       setConfirmedStudentIdSearchTerm(studentIdSearchTerm);
       setConfirmedCardCodeSearchTerm(cardCodeSearchTerm);
-      setCurrentPage(1); // รีเซ็ตหน้าเมื่อกด Enter
+      setCurrentPage(1);
     }
   };
 
   const handleDownloadTemplate = () => {
     const wb = XLSX.utils.book_new();
-    
-    
-    // สร้างข้อมูลสำหรับเทมเพลต
     const templateData = [
       { 
         "รหัสนักเรียน": 0, 
@@ -66,41 +62,12 @@ function AllStudents() {
         "ห้อง": 0 
       }
     ];
-  
-    // สร้าง worksheet จากข้อมูล
     const ws = XLSX.utils.json_to_sheet(templateData);
-  
     ws['!cols'] = [
-      { wch: 15 }, // อีเมล
-      { wch: 25 }, // รหัสผ่าน
-      { wch: 25 }, // เบอร์โทร
-      { wch: 25 }, // ชื่อ
-      { wch: 15 }, // นามสกุล
-      { wch: 25 }, 
-      { wch: 15 }, 
-      { wch: 15 }, 
-      { wch: 15 }, 
-  ];
-    // กำหนดรูปแบบเซลล์ให้คอลัมน์ "รหัสนักเรียน", "เลขประจำตัวประชาชน", และ "เบอร์โทร" เป็น Text
-    const range = XLSX.utils.decode_range(ws['!ref']);
-    for (let R = range.s.r; R <= range.e.r; ++R) {
-      for (let C = range.s.c; C <= range.e.c; ++C) {
-        const cell_address = { c: C, r: R };
-        const cell_ref = XLSX.utils.encode_cell(cell_address);
-        if (!ws[cell_ref]) continue;
-  
-        // ตรวจสอบคอลัมน์ที่ต้องการกำหนดเป็น Text
-        if (C === 1 || C === 4) { // คอลัมน์ "รหัสนักเรียน" (0), "เลขประจำตัวประชาชน" (1), "เบอร์โทร" (4)
-          ws[cell_ref].t = 's'; // กำหนดประเภทเซลล์เป็น String (Text)
-          ws[cell_ref].z = '@'; // กำหนดรูปแบบเซลล์เป็น Text
-        }
-      }
-    }
-  
-    // เพิ่ม worksheet ลงใน workbook
+      { wch: 15 }, { wch: 25 }, { wch: 25 }, { wch: 25 }, 
+      { wch: 15 }, { wch: 25 }, { wch: 15 }, { wch: 15 }
+    ];
     XLSX.utils.book_append_sheet(wb, ws, "Template");
-  
-    // บันทึกและดาวน์โหลดไฟล์
     XLSX.writeFile(wb, "student_template.xlsx");
   };
 
@@ -108,20 +75,17 @@ function AllStudents() {
     try {
       const formData = new FormData();
       formData.append("file", file);
-  
       await axios.post("https://club-registration-backend-production.up.railway.app/upload_excel", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
-  
       Swal.fire({
         icon: 'success',
         title: 'อัปโหลดสำเร็จ!',
         text: 'ไฟล์ถูกอัปโหลดเรียบร้อยแล้ว',
         confirmButtonText: 'ตกลง'
       });
-  
       fetchData();
     } catch (error) {
       console.error("Error uploading file:", error);
@@ -321,8 +285,6 @@ function AllStudents() {
     };
   };
 
-  
-
   const filteredStudents = students.filter((student) =>
     ['first_name', 'last_name'].some((key) =>
       typeof student[key] === 'string' && (
@@ -345,9 +307,61 @@ function AllStudents() {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+  const Pagination = ({ itemsPerPage, totalItems, paginate, currentPage }) => {
+    const pageNumbers = [];
+    for (let i = 1; i <= Math.ceil(totalItems / itemsPerPage); i++) {
+      pageNumbers.push(i);
+    }
+
+    const maxPagesToShow = 5;
+    let startPage, endPage;
+
+    if (pageNumbers.length <= maxPagesToShow) {
+      startPage = 1;
+      endPage = pageNumbers.length;
+    } else {
+      const maxPagesBeforeCurrentPage = Math.floor(maxPagesToShow / 2);
+      const maxPagesAfterCurrentPage = Math.ceil(maxPagesToShow / 2) - 1;
+
+      if (currentPage <= maxPagesBeforeCurrentPage) {
+        startPage = 1;
+        endPage = maxPagesToShow;
+      } else if (currentPage + maxPagesAfterCurrentPage >= pageNumbers.length) {
+        startPage = pageNumbers.length - maxPagesToShow + 1;
+        endPage = pageNumbers.length;
+      } else {
+        startPage = currentPage - maxPagesBeforeCurrentPage;
+        endPage = currentPage + maxPagesAfterCurrentPage;
+      }
+    }
+
+    return (
+      <nav>
+        <ul className="pagination">
+          <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+            <button onClick={() => paginate(currentPage - 1)} className="page-link">
+              ก่อนหน้า
+            </button>
+          </li>
+          {pageNumbers.slice(startPage - 1, endPage).map((number) => (
+            <li key={number} className={`page-item ${currentPage === number ? 'active' : ''}`}>
+              <button onClick={() => paginate(number)} className="page-link">
+                {number}
+              </button>
+            </li>
+          ))}
+          <li className={`page-item ${currentPage === pageNumbers.length ? 'disabled' : ''}`}>
+            <button onClick={() => paginate(currentPage + 1)} className="page-link">
+              ถัดไป
+            </button>
+          </li>
+        </ul>
+      </nav>
+    );
+  };
+
   return (
     <div className="container" style={{ overflowX: "auto" }}>
-      {/* ส่วนหัวและปุ่มเพิ่มนักเรียน */}
       <div className='d-flex flex-row bd-highlight mb-3'>
         <div className="p-2 bd-highlight">
           <button className='btn btn-success' onClick={handleAddStudent}>+เพิ่มนักเรียน</button>
@@ -365,10 +379,8 @@ function AllStudents() {
             ดาวน์โหลดเทมเพลต
           </button>
         </div>
-        
       </div>
 
-      {/* Modal สำหรับเพิ่มนักเรียน */}
       <AddStudent
         show={showAddModal}
         onHide={handleCloseAddModal}
@@ -378,7 +390,6 @@ function AllStudents() {
         }}
       />
 
-      {/* Modal สำหรับแก้ไขนักเรียน */}
       <EditStudent
         show={showEditModal}
         onHide={handleCloseEditModal}
@@ -389,7 +400,6 @@ function AllStudents() {
         }}
       />
 
-      {/* ส่วนค้นหาและตัวกรองข้อมูล */}
       <h1>ข้อมูลนักเรียน</h1>
       <div className="row mb-3">
         <h5 style={{ marginTop: "20px" }}>ค้นหาแบบบุคคล</h5>
@@ -442,7 +452,6 @@ function AllStudents() {
         </div>
       </div>
 
-      {/* ตารางแสดงข้อมูลนักเรียน */}
       <div className="table-responsive" style={{ overflowX: "auto" }}>
         <button className='btn btn-danger' onClick={handleDeleteSelectedItems}>ลบรายการที่เลือก</button>
         <table className="table table-striped">
@@ -502,23 +511,25 @@ function AllStudents() {
             ) : (
               <tr>
                 <td colSpan="10" className="text-center">
-                  {(confirmedSearchTerm === '' && confirmedStudentIdSearchTerm === '' && confirmedCardCodeSearchTerm === '' && selectedClassName === '' && selectedRoomName === '') ? 'ค้นหา' : 'ไม่พบข้อมูล'}
+                  {(
+                    confirmedSearchTerm === '' &&
+                    confirmedStudentIdSearchTerm === '' &&
+                    confirmedCardCodeSearchTerm === '' &&
+                    selectedClassName === '' &&
+                    selectedRoomName === ''
+                  ) ? 'ค้นหา' : 'ไม่พบข้อมูล'}
                 </td>
               </tr>
             )}
           </tbody>
         </table>
 
-        {/* Pagination */}
-        <ul className="pagination">
-          {[...Array(Math.ceil(sortedStudents.length / itemsPerPage)).keys()].map((number) => (
-            <li key={number + 1} className="page-item">
-              <button onClick={() => paginate(number + 1)} className="page-link">
-                {number + 1}
-              </button>
-            </li>
-          ))}
-        </ul>
+        <Pagination
+          itemsPerPage={itemsPerPage}
+          totalItems={sortedStudents.length}
+          paginate={paginate}
+          currentPage={currentPage}
+        />
       </div>
     </div>
   );
